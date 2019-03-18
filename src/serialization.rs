@@ -4,13 +4,13 @@ pub struct DeserializationError
     }
 
     pub trait Serializable {
-        fn serialize(&self) -> &[u8];
+        fn serialize(&self) -> Vec<u8>;
         fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError> where Self: Sized;
     }
 
     impl Serializable for String {
-        fn serialize(&self) -> &[u8] {
-            self.as_bytes()
+        fn serialize(&self) -> Vec<u8> {
+            self.as_bytes().to_vec()
         }
 
         fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError>

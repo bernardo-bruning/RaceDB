@@ -1,4 +1,5 @@
 mod serialization;
+mod pagination;
 
 #[cfg(test)]
 mod tests {
@@ -9,7 +10,7 @@ mod tests {
         let default_value = "teste";
         let value = String::from(default_value);
         let serialized = value.serialize();
-        let result = String::deserialize(serialized);
+        let result = String::deserialize(&serialized);
 
         match result {
             Ok(value_result) => assert_eq!(value, value_result),
