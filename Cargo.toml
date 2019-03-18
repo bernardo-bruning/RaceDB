@@ -1,7 +1,7 @@
 [package]
-name = "racedb"
+name = "rust-example"
 version = "0.1.0"
-authors = ["bernardo <bernardo.bruning@gmail.com>"]
+authors = ["Bernardo de Oliveira Bruning <bernardo.bruning@gmail.com>"]
 edition = "2018"
 
 [dependencies]
