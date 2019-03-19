@@ -3,7 +3,9 @@ mod pagination;
 
 #[cfg(test)]
 mod tests {
-    pub use crate::serialization::Serializable;
+    use crate::serialization::Serializable;
+    use crate::pagination::Page;
+    use std::fmt::Debug;
 
     #[test]
     fn test_serialization_and_deserialization_string() {
@@ -21,10 +23,20 @@ mod tests {
     #[test]
     fn test_deserialization_corrupt_string() {
         let result = String::deserialize(&[132]);
-
         match result {
             Ok(_) => panic!("Not detected corrupt string"),
             _ => ()
         };
+    }
+
+    #[test]
+    fn test_serialization_and_deserialization_page() {
+        let page = Page::from("teste");
+        let serialized = page.serialize();
+        let deserialized = Page::deserialize(&serialized);
+        let page_deserialized = deserialized.unwrap();
+        assert_eq!(page_deserialized.size, page.size);
+        assert_eq!(page_deserialized.next, page.next);
+        assert_eq!(page_deserialized.content, page.content);
     }
 }
