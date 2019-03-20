@@ -46,4 +46,14 @@ mod tests {
         let pages = paginate(string, 3);
         assert_eq!(pages.len(), 4);
     }
+
+    #[test]
+    fn test_values_from_page() {
+        let string = "this is a test".to_string();
+        let pages = paginate(string, 7);
+        let first_page: &Page = pages.first().unwrap();
+        let last_page: &Page = pages.last().unwrap();
+        assert_eq!(String::from_utf8_lossy(&first_page.content), "this is");
+        assert_eq!(String::from_utf8_lossy(&last_page.content), " a test");
+    }
 }
