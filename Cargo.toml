@@ -1,5 +1,5 @@
 [package]
-name = "rust-example"
+name = "race-db"
 version = "0.1.0"
 authors = ["Bernardo de Oliveira Bruning <bernardo.bruning@gmail.com>"]
 edition = "2018"

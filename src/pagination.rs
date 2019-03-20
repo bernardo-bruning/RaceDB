@@ -2,7 +2,6 @@ use crate::serialization::Serializable;
 use crate::serialization::DeserializationError;
 use std::vec::Vec;
 use std::convert::From;
-use std::slice::Chunks;
 use std::iter::*;
 
 pub struct Page {
