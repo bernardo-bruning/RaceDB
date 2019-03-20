@@ -5,6 +5,7 @@ mod pagination;
 mod tests {
     use crate::serialization::Serializable;
     use crate::pagination::Page;
+    use crate::pagination::paginate;
 
     #[test]
     fn test_serialization_and_deserialization_string() {
@@ -37,5 +38,12 @@ mod tests {
         assert_eq!(page_deserialized.size, page.size);
         assert_eq!(page_deserialized.next, page.next);
         assert_eq!(page_deserialized.content, page.content);
+    }
+
+    #[test]
+    fn test_len_paginate_from_simple_string() {
+        let string = "string test".to_string();
+        let pages = paginate(string, 3);
+        assert_eq!(pages.len(), 4);
     }
 }

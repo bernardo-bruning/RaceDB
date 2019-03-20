@@ -1,3 +1,5 @@
+use std::marker::Sized;
+
 #[derive(Debug)]
 pub struct DeserializationError
 {

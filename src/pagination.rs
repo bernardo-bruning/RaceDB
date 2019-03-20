@@ -10,6 +10,12 @@ pub struct Page {
     pub content: Vec<u8>
 }
 
+pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page> 
+        where TSerializable : Serializable
+{
+    Vec::default()
+}
+
 fn convert_u8_to_u32(array: &[u8; 4]) -> u32 {
     ((array[0] as u32) << 24) +
     ((array[1] as u32) << 16) +
