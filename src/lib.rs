@@ -5,7 +5,6 @@ mod pagination;
 mod tests {
     use crate::serialization::Serializable;
     use crate::pagination::Page;
-    use std::fmt::Debug;
 
     #[test]
     fn test_serialization_and_deserialization_string() {
