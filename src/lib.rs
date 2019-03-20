@@ -1,11 +1,16 @@
 mod serialization;
 mod pagination;
+mod storage;
 
 #[cfg(test)]
 mod tests {
     use crate::serialization::Serializable;
     use crate::pagination::Page;
     use crate::pagination::paginate;
+    use crate::storage::allocate;
+    use std::io::Cursor;
+    use std::io::Seek;
+    use std::io::SeekFrom;
 
     #[test]
     fn test_serialization_and_deserialization_string() {
@@ -55,5 +60,15 @@ mod tests {
         let last_page: &Page = pages.last().unwrap();
         assert_eq!(String::from_utf8_lossy(&first_page.content), "this is");
         assert_eq!(String::from_utf8_lossy(&last_page.content), " a test");
+    }
+
+    #[test]
+    fn test_allocator_pages() {
+        let string = "this is a test7".to_string();
+        let pages = paginate(string, 2);
+        let cursor = Cursor::new(Vec::new() as Vec<u8>);
+        let (mut cursor_updated, index_file) = allocate(cursor, pages);
+        assert_eq!(index_file, 0);
+        assert_eq!(cursor_updated.seek(SeekFrom::End(0)).unwrap(), 560);
     }
 }
