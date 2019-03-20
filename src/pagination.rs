@@ -2,6 +2,7 @@ use crate::serialization::Serializable;
 use crate::serialization::DeserializationError;
 use std::vec::Vec;
 use std::convert::From;
+use std::slice::Chunks;
 use std::iter::*;
 
 pub struct Page {
@@ -13,7 +14,11 @@ pub struct Page {
 pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page> 
         where TSerializable : Serializable
 {
-    Vec::default()
+    let bytes_data: Vec<u8> = data.serialize();
+    bytes_data
+        .chunks(size as usize)
+        .map(|x| Page::from(x))
+        .collect()
 }
 
 fn convert_u8_to_u32(array: &[u8; 4]) -> u32 {
@@ -62,12 +67,25 @@ impl Serializable for Page {
     }
 }
 
+impl From<&[u8]> for Page {
+    fn from(value: &[u8]) -> Self
+    {
+        let size = value.len() as u32;
+        Page {
+            next: 0,
+            size: size,
+            content: value.to_vec()
+        }
+    }
+}
+
 impl From<&str> for Page {
     fn from(value: &str) -> Self
     {
+        let size = value.len() as u32;
         Page {
             next: 0,
-            size: 5,
+            size: size,
             content: value.as_bytes().to_vec()
         }
     }
