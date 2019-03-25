@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_allocator_pages() {
-        let string = "this is a teste".to_string();
+        let string = "this is a test".to_string();
         let pages = paginate(string, 2);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
         let index_file = allocate(&mut cursor, pages);
