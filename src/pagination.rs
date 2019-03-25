@@ -10,13 +10,24 @@ pub struct Page {
     pub content: Vec<u8>
 }
 
+pub fn fill<T>(source: &Vec<T>, default: T, size: usize) -> Vec<T> where T: Clone {
+    let diff_size = size - source.len();
+    let fill = (0..diff_size).map(|x| default.clone()).collect();
+    let source_filled = [source.clone(), fill];
+    source_filled.concat()
+}
+
 pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page> 
         where TSerializable : Serializable
 {
     let bytes_data: Vec<u8> = data.serialize();
     bytes_data
         .chunks(size as usize)
-        .map(|x| Page::from(x))
+        .map(|x| Page {
+            next: 0,
+            size: size,
+            content: x.to_vec()
+        })
         .collect()
 }
 
@@ -42,7 +53,7 @@ impl Serializable for Page {
     {
         let size:Vec<u8> = convert_u32_to_u8(self.size).to_vec();
         let next:Vec<u8> = convert_u32_to_u8(self.next).to_vec();
-        let binary = vec![size, next, self.content.clone()];
+        let binary = vec![size, next, fill(&self.content, 0, self.size as usize)];
         binary.concat()
     }
 

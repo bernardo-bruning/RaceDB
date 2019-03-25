@@ -7,6 +7,7 @@ mod tests {
     use crate::serialization::Serializable;
     use crate::pagination::Page;
     use crate::pagination::paginate;
+    use crate::pagination::fill;
     use crate::storage::allocate;
     use std::io::Cursor;
     use std::io::Seek;
@@ -65,11 +66,20 @@ mod tests {
 
     #[test]
     fn test_allocator_pages() {
-        let string = "this is a test".to_string();
+        let string = "this is a teste".to_string();
         let pages = paginate(string, 2);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
         let index_file = allocate(&mut cursor, pages);
         assert_eq!(index_file.unwrap(), 0);
         assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 70);
+    }
+
+    #[test]
+    fn test_fill_vec() {
+        let value: Vec<u8> = Vec::new();
+        let value_filled = fill(&value, 0, 3);
+        
+        assert_eq!(value_filled.capacity(), 3);
+        assert_eq!(value_filled, vec![0, 0, 0])
     }
 }
