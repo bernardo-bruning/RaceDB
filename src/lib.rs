@@ -58,17 +58,18 @@ mod tests {
         let pages = paginate(string, 7);
         let first_page: &Page = pages.first().unwrap();
         let last_page: &Page = pages.last().unwrap();
+        
         assert_eq!(String::from_utf8_lossy(&first_page.content), "this is");
         assert_eq!(String::from_utf8_lossy(&last_page.content), " a test");
     }
 
     #[test]
     fn test_allocator_pages() {
-        let string = "this is a test7".to_string();
+        let string = "this is a test".to_string();
         let pages = paginate(string, 2);
-        let cursor = Cursor::new(Vec::new() as Vec<u8>);
-        let (mut cursor_updated, index_file) = allocate(cursor, pages);
-        assert_eq!(index_file, 0);
-        assert_eq!(cursor_updated.seek(SeekFrom::End(0)).unwrap(), 560);
+        let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
+        let index_file = allocate(&mut cursor, pages);
+        assert_eq!(index_file.unwrap(), 0);
+        assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 70);
     }
 }
