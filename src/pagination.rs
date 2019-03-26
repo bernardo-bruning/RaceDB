@@ -3,7 +3,22 @@ use crate::serialization::DeserializationError;
 use std::vec::Vec;
 use std::convert::From;
 use std::iter::*;
-
+/// Page is a strucuture when enable fast write and read data, creating pages like a book in database.
+/// Pages has a size and reference for next page with also your content data.
+/// In of the file database has the structure data:
+/// 
+/// +-----------+
+/// |Part data A|
+/// |-----------|
+/// |Part data A|
+/// |-----------|
+/// |Part data B|
+/// |-----------|
+/// |Part data A|
+/// +-----------+
+/// 
+/// From this diagram the Data A is slice into 3 parts and Data B in one part, 
+/// from this database file create defragmented information withou rewrite all file when updated one data.
 pub struct Page {
     pub size: u32,
     pub next: u32,
