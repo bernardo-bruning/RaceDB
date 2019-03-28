@@ -8,6 +8,7 @@ mod tests {
     use crate::pagination::Page;
     use crate::pagination::paginate;
     use crate::pagination::fill;
+    use crate::pagination::mount_data;
     use crate::storage::allocate;
     use std::io::Cursor;
     use std::io::Seek;
@@ -79,6 +80,27 @@ mod tests {
         let pages = paginate(data, 15);
         let page = pages.first().unwrap();
         assert_eq!(page.content.len(), 15);
+    }
+
+    #[test]
+    fn test_mount_data_from_pages() {
+        let pages = [
+            // Page with string "tes"
+            Page {
+                next: 0,
+                size: 2,
+                content: [74, 65, 73].to_vec() 
+            },
+            // Page with string "te"
+            Page {
+                next: 0,
+                size: 2,
+                content: [74, 65].to_vec() 
+            }
+        ];
+
+        let text = mount_data::<String>(&pages).unwrap();
+        assert_eq!(text, "teste".to_string())
     }
 
     #[test]

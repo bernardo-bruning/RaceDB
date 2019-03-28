@@ -3,6 +3,8 @@ use crate::serialization::DeserializationError;
 use std::vec::Vec;
 use std::convert::From;
 use std::iter::*;
+use std::io::Error;
+
 /// Page is a strucuture when enable fast write and read data, creating pages like a book in database.
 /// Pages has a size and reference for next page with also your content data.
 /// In of the file database has the structure data:
@@ -19,6 +21,7 @@ use std::iter::*;
 /// 
 /// From this diagram the Data A is slice into 3 parts and Data B in one part, 
 /// from this database file create defragmented information withou rewrite all file when updated one data.
+#[derive(Debug)]
 pub struct Page {
     pub size: u32,
     pub next: u32,
@@ -44,6 +47,13 @@ pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page>
             content: fill(&x.to_vec(), 0, size as usize)
         })
         .collect()
+}
+
+
+pub fn mount_data<TSerializable>(pages: &[Page]) -> Result<TSerializable, DeserializationError> 
+    where TSerializable: Serializable
+{
+    TSerializable::deserialize("".as_bytes())
 }
 
 fn convert_u8_to_u32(array: &[u8; 4]) -> u32 {
