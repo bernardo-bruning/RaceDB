@@ -33,6 +33,13 @@ pub struct Page {
     pub content: Vec<u8>
 }
 
+impl Page {
+    fn extract_content(&self) -> Vec<u8>
+    {
+        self.content.to_owned()
+    }
+}
+
 pub fn fill<T>(source: &Vec<T>, default: T, size: usize) -> Vec<T> where T: Clone {
     let diff_size = size - source.len();
     let fill = (0..diff_size).map(|x| default.clone()).collect();
@@ -55,11 +62,22 @@ pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page>
         .collect()
 }
 
+fn are_ordered_pages(pages: &[Page]) -> bool
+{
+    true
+}
 
 pub fn mount_data<TSerializable>(pages: &[Page]) -> Result<TSerializable, DeserializationError> 
     where TSerializable: Serializable
 {
-    TSerializable::deserialize("".as_bytes())
+    debug_assert!(are_ordered_pages(pages));
+    let content = pages
+        .iter()
+        .map(|x| x.extract_content())
+        .collect::<Vec<Vec<u8>>>()
+        .concat();
+
+    TSerializable::deserialize(&content)
 }
 
 fn convert_u8_to_u32(array: &[u8; 4]) -> u32 {

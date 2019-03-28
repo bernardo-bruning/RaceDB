@@ -90,19 +90,19 @@ mod tests {
                 id: 0,
                 next: 1,
                 size: 2,
-                content: [74, 65, 73].to_vec() 
+                content: [116, 101, 115].to_vec() 
             },
             // Page with string "te"
             Page {
                 id: 1,
                 next: 0,
                 size: 2,
-                content: [74, 65].to_vec() 
+                content: [116, 101].to_vec() 
             }
         ];
 
         let text = mount_data::<String>(&pages).unwrap();
-        assert_eq!(text, "teste".to_string())
+        assert_eq!(text, "teste".to_string());
     }
 
     #[test]
