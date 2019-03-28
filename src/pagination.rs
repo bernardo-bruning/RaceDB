@@ -23,8 +23,13 @@ use std::io::Error;
 /// from this database file create defragmented information withou rewrite all file when updated one data.
 #[derive(Debug)]
 pub struct Page {
-    pub size: u32,
+    //Contains page ID, this data is not serialize to not consume space
+    pub id: u32,
+    // Contains ID for next page
     pub next: u32,
+    // Represent size of the content
+    pub size: u32,
+    // Represent content of the page
     pub content: Vec<u8>
 }
 
@@ -42,8 +47,9 @@ pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page>
     bytes_data
         .chunks(size as usize)
         .map(|x| Page {
+            id: 0,
             next: 0,
-            size: size,
+            size: x.len() as u32,
             content: fill(&x.to_vec(), 0, size as usize)
         })
         .collect()
@@ -95,6 +101,7 @@ impl Serializable for Page {
         let content: Vec<u8> = Vec::from(bytes).iter().skip(8).map(|x| x.to_owned()).collect();
         
         Result::Ok(Page {
+            id: 0,
             size: convert_u8_to_u32(&size),
             next: convert_u8_to_u32(&next),
             content: content
@@ -107,6 +114,7 @@ impl From<&[u8]> for Page {
     {
         let size = value.len() as u32;
         Page {
+            id: 0,
             next: 0,
             size: size,
             content: value.to_vec()
@@ -119,6 +127,7 @@ impl From<&str> for Page {
     {
         let size = value.len() as u32;
         Page {
+            id: 0,
             next: 0,
             size: size,
             content: value.as_bytes().to_vec()

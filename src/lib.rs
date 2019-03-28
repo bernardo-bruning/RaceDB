@@ -87,12 +87,14 @@ mod tests {
         let pages = [
             // Page with string "tes"
             Page {
-                next: 0,
+                id: 0,
+                next: 1,
                 size: 2,
                 content: [74, 65, 73].to_vec() 
             },
             // Page with string "te"
             Page {
+                id: 1,
                 next: 0,
                 size: 2,
                 content: [74, 65].to_vec() 
