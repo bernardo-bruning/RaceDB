@@ -90,14 +90,14 @@ mod tests {
                 id: 0,
                 next: 1,
                 size: 2,
-                content: [116, 101, 115].to_vec() 
+                content: "tes".as_bytes().to_vec()
             },
             // Page with string "te"
             Page {
                 id: 1,
                 next: 0,
                 size: 2,
-                content: [116, 101].to_vec() 
+                content: "te".as_bytes().to_vec()
             }
         ];
 
