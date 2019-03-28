@@ -37,7 +37,8 @@ mod tests {
 
     #[test]
     fn test_serialization_and_deserialization_page() {
-        let page = Page::from("teste");
+        let pages = paginate("test".to_string(), 5);
+        let page = pages.first().unwrap();
         let serialized = page.serialize();
         let deserialized = Page::deserialize(&serialized);
         let page_deserialized = deserialized.unwrap();
@@ -62,6 +63,22 @@ mod tests {
         
         assert_eq!(String::from_utf8_lossy(&first_page.content), "this is");
         assert_eq!(String::from_utf8_lossy(&last_page.content), " a test");
+    }
+
+    #[test]
+    fn test_create_paginate_full() {
+        let data = "this is a test!".to_string();
+        let pages = paginate(data, 15);
+        let page = pages.first().unwrap();
+        assert_eq!(page.content.len(), 15);
+    }
+
+    #[test]
+    fn test_create_paginate_partial_content() {
+        let data = "this is a test".to_string();
+        let pages = paginate(data, 15);
+        let page = pages.first().unwrap();
+        assert_eq!(page.content.len(), 15);
     }
 
     #[test]

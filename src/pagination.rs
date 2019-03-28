@@ -41,7 +41,7 @@ pub fn paginate<TSerializable>(data: TSerializable, size: u32) -> Vec<Page>
         .map(|x| Page {
             next: 0,
             size: size,
-            content: x.to_vec()
+            content: fill(&x.to_vec(), 0, size as usize)
         })
         .collect()
 }
@@ -68,7 +68,7 @@ impl Serializable for Page {
     {
         let size:Vec<u8> = convert_u32_to_u8(self.size).to_vec();
         let next:Vec<u8> = convert_u32_to_u8(self.next).to_vec();
-        let binary = vec![size, next, fill(&self.content, 0, self.size as usize)];
+        let binary = vec![size, next, self.content.to_vec()];
         binary.concat()
     }
 
