@@ -97,6 +97,18 @@ fn convert_u32_to_u8(x: u32) -> [u8;4] {
     [b1, b2, b3, b4]
 }
 
+fn collect_u32(from: &[u8], starting: usize) -> u32{
+        let mut value: [u8; 4] = [0;4];
+        let value_arr: Vec<u8> = from
+            .iter()
+            .skip(starting)
+            .take(4)
+            .map(|x| x.to_owned())
+            .collect();
+        value.copy_from_slice(&value_arr);
+        convert_u8_to_u32(&value)
+}
+
 impl Serializable for Page {
     fn serialize(&self) -> Vec<u8>
     {
@@ -107,21 +119,13 @@ impl Serializable for Page {
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError> where Self: Sized
-    {        
-        let mut size: [u8; 4] = [0;4];
-        let size_arr: Vec<u8> = bytes.iter().take(4).map(|x| x.to_owned()).collect();
-        size.copy_from_slice(&size_arr);
-
-        let mut next: [u8; 4] = [0;4];
-        let next_arr: Vec<u8> = bytes.iter().skip(4).take(4).map(|x| x.to_owned()).collect();
-        next.copy_from_slice(&next_arr);
-
+    {
         let content: Vec<u8> = Vec::from(bytes).iter().skip(8).map(|x| x.to_owned()).collect();
         
         Result::Ok(Page {
             id: 0,
-            size: convert_u8_to_u32(&size),
-            next: convert_u8_to_u32(&next),
+            size: collect_u32(bytes, 0),
+            next: collect_u32(bytes, 4),
             content: content
         })
     }
