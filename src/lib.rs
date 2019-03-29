@@ -108,7 +108,7 @@ mod tests {
         let pages = Pages::from(&string, 2);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
         pages.store(&mut cursor);
-        assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 70);
+        assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 74);
     }
 
     #[test]

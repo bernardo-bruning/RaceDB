@@ -6,23 +6,6 @@ use std::iter::*;
 use std::io::Error;
 use std::slice::Iter;
 
-fn convert_u8_to_u32(array: &[u8; 4]) -> u32 {
-    ((array[0] as u32) << 24) +
-    ((array[1] as u32) << 16) +
-    ((array[2] as u32) <<  8) +
-    ((array[3] as u32) <<  0)
-}
-
-
-
-fn convert_u32_to_u8(x: u32) -> [u8;4] {
-    let b1 : u8 = ((x >> 24) & 0xff) as u8;
-    let b2 : u8 = ((x >> 16) & 0xff) as u8;
-    let b3 : u8 = ((x >> 8) & 0xff) as u8;
-    let b4 : u8 = (x & 0xff) as u8;
-    [b1, b2, b3, b4]
-}
-
 /// Page is a strucuture when enable fast write and read data, creating pages like a book in database.
 /// Pages has a size and reference for next page with also your content data.
 /// In of the file database has the structure data:
@@ -55,6 +38,11 @@ impl Page {
     fn extract_content(&self) -> Vec<u8>
     {
         self.content.to_owned()
+    }
+
+    fn is_free(&self) -> bool
+    {
+        self.id == 0
     }
 }
 
@@ -96,14 +84,16 @@ impl Pages {
 impl Serializable for Pages {
     fn serialize(&self) -> Vec<u8>
     {
-        self
+        let content: Vec<u8> = self
             .iter()
             .flat_map(|x| x.serialize())
-            .collect()
+            .collect();
+        [self.page_size.serialize(), content].concat()
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError> where Self: Sized
     {
+        
         Result::Ok(Pages{
             page_size: 0,
             content: Vec::new()
@@ -151,7 +141,7 @@ pub fn mount_data<TSerializable>(pages: &[Page]) -> Result<TSerializable, Deseri
     TSerializable::deserialize(&content)
 }
 
-fn collect_u32(from: &[u8], starting: usize) -> u32{
+fn collect_u32(from: &[u8], starting: usize) -> Result<u32, DeserializationError>{
         let mut value: [u8; 4] = [0;4];
         let value_arr: Vec<u8> = from
             .iter()
@@ -160,14 +150,14 @@ fn collect_u32(from: &[u8], starting: usize) -> u32{
             .map(|x| x.to_owned())
             .collect();
         value.copy_from_slice(&value_arr);
-        convert_u8_to_u32(&value)
+        u32::deserialize(&value)
 }
 
 impl Serializable for Page {
     fn serialize(&self) -> Vec<u8>
     {
-        let size:Vec<u8> = convert_u32_to_u8(self.size).to_vec();
-        let next:Vec<u8> = convert_u32_to_u8(self.next).to_vec();
+        let size:Vec<u8> = self.size.serialize();
+        let next:Vec<u8> = self.next.serialize();
         let binary = vec![size, next, self.content.to_vec()];
         binary.concat()
     }
@@ -179,14 +169,18 @@ impl Serializable for Page {
             .iter()
             .skip(8)
             .map(|x| x.to_owned())
-            .collect();
-        
-        Result::Ok(Page {
-            id: 0,
-            size: collect_u32(bytes, 0),
-            next: collect_u32(bytes, 4),
-            content: content
-        })
+            .collect();        
+
+        match (collect_u32(bytes, 0), collect_u32(bytes, 4)){
+            (Ok(size), Ok(next)) => 
+                Ok(Page {
+                    id: 0,
+                    size: size,
+                    next: next,
+                    content: content
+                }),
+            _ => Result::Err(DeserializationError::new())
+        }
     }
 }
 

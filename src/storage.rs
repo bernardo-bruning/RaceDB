@@ -1,7 +1,7 @@
 use std::io::Read;
 use std::io::Write;
 use std::io::Seek;
-use std::io::Cursor;
+use std::io::SeekFrom;
 use crate::pagination::Pages;
 use crate::pagination::Page;
 use crate::serialization::Serializable;
