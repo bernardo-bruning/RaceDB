@@ -4,12 +4,9 @@ mod storage;
 
 #[cfg(test)]
 mod tests {
-    use crate::serialization::Serializable;
-    use crate::pagination::Page;
-    use crate::pagination::paginate;
-    use crate::pagination::fill;
-    use crate::pagination::mount_data;
-    use crate::storage::allocate;
+    use crate::serialization::*;
+    use crate::pagination::*;
+    use crate::storage::*;
     use std::io::Cursor;
     use std::io::Seek;
     use std::io::SeekFrom;
@@ -38,7 +35,7 @@ mod tests {
 
     #[test]
     fn test_serialization_and_deserialization_page() {
-        let pages = paginate("test".to_string(), 5);
+        let pages = Pages::from(&"test".to_string(), 5);
         let page = pages.first().unwrap();
         let serialized = page.serialize();
         let deserialized = Page::deserialize(&serialized);
@@ -51,14 +48,14 @@ mod tests {
     #[test]
     fn test_len_paginate_from_simple_string() {
         let string = "string test".to_string();
-        let pages = paginate(string, 3);
+        let pages = Pages::from(&string, 3);
         assert_eq!(pages.len(), 4);
     }
 
     #[test]
     fn test_values_from_page() {
         let string = "this is a test".to_string();
-        let pages = paginate(string, 7);
+        let pages = Pages::from(&string, 7);
         let first_page: &Page = pages.first().unwrap();
         let last_page: &Page = pages.last().unwrap();
         
@@ -69,7 +66,7 @@ mod tests {
     #[test]
     fn test_create_paginate_full() {
         let data = "this is a test!".to_string();
-        let pages = paginate(data, 15);
+        let pages = Pages::from(&data, 15);
         let page = pages.first().unwrap();
         assert_eq!(page.content.len(), 15);
     }
@@ -77,7 +74,7 @@ mod tests {
     #[test]
     fn test_create_paginate_partial_content() {
         let data = "this is a test".to_string();
-        let pages = paginate(data, 15);
+        let pages = Pages::from(&data, 15);
         let page = pages.first().unwrap();
         assert_eq!(page.content.len(), 15);
     }
@@ -108,7 +105,7 @@ mod tests {
     #[test]
     fn test_allocator_pages() {
         let string = "this is a test".to_string();
-        let pages = paginate(string, 2);
+        let pages = Pages::from(&string, 2);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
         let index_file = allocate(&mut cursor, pages);
         assert_eq!(index_file.unwrap(), 0);

@@ -2,10 +2,11 @@ use std::io::Read;
 use std::io::Write;
 use std::io::Seek;
 use crate::pagination::Page;
+use crate::pagination::Pages;
 use crate::serialization::Serializable;
 use std::io::Error;
 
-pub fn allocate<RW: Read+Write+Seek>(target:&mut RW, source: Vec<Page>) -> Result<u32, Error>
+pub fn allocate<RW: Read+Write+Seek>(target:&mut RW, source: Pages) -> Result<u32, Error>
 {
   let source_serialized: Vec<u8> = source
     .iter()
