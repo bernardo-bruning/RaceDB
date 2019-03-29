@@ -87,8 +87,27 @@ impl Pages {
     {
         self.content.last()
     }
+    
     pub fn iter(&self) -> Iter<Page> {
         self.content.iter()
+    }
+}
+
+impl Serializable for Pages {
+    fn serialize(&self) -> Vec<u8>
+    {
+        self
+            .iter()
+            .flat_map(|x| x.serialize())
+            .collect()
+    }
+
+    fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError> where Self: Sized
+    {
+        Result::Ok(Pages{
+            page_size: 0,
+            content: Vec::new()
+        })
     }
 }
 

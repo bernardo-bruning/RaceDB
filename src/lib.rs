@@ -107,8 +107,7 @@ mod tests {
         let string = "this is a test".to_string();
         let pages = Pages::from(&string, 2);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
-        let index_file = allocate(&mut cursor, pages);
-        assert_eq!(index_file.unwrap(), 0);
+        pages.store(&mut cursor);
         assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 70);
     }
 
