@@ -19,10 +19,13 @@ impl Storable for Page {
   fn store(self, store: &mut Store) -> Result<Self, Error>
   {
     let source_serialized: Vec<u8> = self.serialize();
+    let current_position = store.seek(SeekFrom::Current(0));
     let result = store.write(&source_serialized);
-    match result {
-      Ok(_) => Ok(self),
-      Err(error) => Err(error)
+    
+    match (current_position, result) {
+      (Ok(position), Ok(size_bytes_writed)) => Ok(self.set_id(position as usize)),
+      (Ok(position), Err(write_bytes)) => Err(write_bytes),
+      (Err(error_seek), _) => Err(error_seek)
     }
   }
 }
@@ -31,9 +34,14 @@ impl Storable for Pages {
   fn store(self, store: &mut Store) -> Result<Self, Error>
   {
     let source_serialized: Vec<u8> = self.serialize();
-    let result = store.write(&source_serialized);
+    let page_size = self.page_size;
+    let result: Result<Vec<Page>, Error> = self
+      .into_iter()
+      .map(|x| x.store(store))
+      .collect();
+      
     match result {
-      Ok(_) => Ok(self),
+      Ok(pages) => Ok(Pages::new(page_size, pages)),
       Err(error) => Err(error)
     }
   }

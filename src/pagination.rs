@@ -4,6 +4,7 @@ use std::vec::Vec;
 use std::convert::From;
 use std::iter::*;
 use std::io::Error;
+use std::vec::IntoIter;
 use std::slice::Iter;
 
 /// Page is a strucuture when enable fast write and read data, creating pages like a book in database.
@@ -50,14 +51,28 @@ impl Page {
         let page_offset = 2*4;
         (page_offset + size)
     }
+
+    pub fn set_id(mut self, id: usize) -> Self
+    {
+        self.id = id;
+        self
+    }
 }
 
 pub struct Pages{
-    page_size: usize,
+    pub page_size: usize,
     content: Vec<Page>
 }
 
 impl Pages {
+    pub fn new(page_size: usize, content: Vec<Page>) -> Pages
+    {
+        Pages {
+            page_size: page_size,
+            content: content
+        }
+    }
+
     pub fn from<TSerializable>(object: &TSerializable, page_size: usize) -> Self
         where TSerializable: Serializable
     {
@@ -86,10 +101,14 @@ impl Pages {
         self.content.iter()
     }
 
+    pub fn into_iter(self) -> IntoIter<Page> {
+        self.content.into_iter()
+    }
+
     pub fn get_byte_size(&self) -> usize
     {
         let pages_offset = 4;
-        pages_offset + (Page::get_bytes_size(self.page_size) * self.len())
+        (Page::get_bytes_size(self.page_size) * self.len())
     }
 }
 

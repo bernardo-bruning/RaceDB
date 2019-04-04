@@ -119,10 +119,9 @@ mod tests {
         pages = pages.store(&mut cursor).unwrap();
         let mut pages_iter = pages.iter();
 
-        let offset = 4;
-        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 0 + offset);
-        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 1 + offset);
-        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 2 + offset);
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 0);
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 1);
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 2);
     }
 
     #[test]
