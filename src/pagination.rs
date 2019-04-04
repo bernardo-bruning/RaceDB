@@ -25,7 +25,7 @@ use std::slice::Iter;
 #[derive(Debug)]
 pub struct Page {
     //Contains page ID, this data is not serialize to not consume space
-    pub id: u32,
+    pub id: usize,
     // Contains ID for next page
     pub next: u32,
     // Represent size of the content
@@ -43,6 +43,12 @@ impl Page {
     fn is_free(&self) -> bool
     {
         self.id == 0
+    }
+
+    pub fn get_bytes_size(size: usize) -> usize
+    {
+        let page_offset = 2*4;
+        (page_offset + size)
     }
 }
 
@@ -82,9 +88,8 @@ impl Pages {
 
     pub fn get_byte_size(&self) -> usize
     {
-        let page_offset = 2*4;
         let pages_offset = 4;
-        pages_offset + ((page_offset + self.page_size) * self.len())
+        pages_offset + (Page::get_bytes_size(self.page_size) * self.len())
     }
 }
 

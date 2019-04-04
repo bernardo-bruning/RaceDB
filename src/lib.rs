@@ -112,6 +112,20 @@ mod tests {
     }
 
     #[test]
+    fn test_allocator_pages_with_id() {
+        let string = "this is a test".to_string();
+        let mut pages = Pages::from(&string, 2);
+        let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
+        pages = pages.store(&mut cursor).unwrap();
+        let mut pages_iter = pages.iter();
+
+        let offset = 4;
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 0 + offset);
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 1 + offset);
+        assert_eq!(pages_iter.next().unwrap().id, Page::get_bytes_size(2) * 2 + offset);
+    }
+
+    #[test]
     fn test_fill_vec() {
         let value: Vec<u8> = Vec::new();
         let value_filled = fill(&value, 0, 3);
