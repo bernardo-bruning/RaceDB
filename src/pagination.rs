@@ -79,6 +79,13 @@ impl Pages {
     pub fn iter(&self) -> Iter<Page> {
         self.content.iter()
     }
+
+    pub fn get_byte_size(&self) -> usize
+    {
+        let page_offset = 2*4;
+        let pages_offset = 4;
+        pages_offset + ((page_offset + self.page_size) * self.len())
+    }
 }
 
 impl Serializable for Pages {

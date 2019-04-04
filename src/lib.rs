@@ -105,10 +105,10 @@ mod tests {
     #[test]
     fn test_allocator_pages() {
         let string = "this is a test".to_string();
-        let pages = Pages::from(&string, 2);
+        let mut pages = Pages::from(&string, 7);
         let mut cursor = Cursor::new(Vec::new() as Vec<u8>);
-        pages.store(&mut cursor);
-        assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), 74);
+        pages = pages.store(&mut cursor).unwrap();
+        assert_eq!(cursor.seek(SeekFrom::End(0)).unwrap(), pages.get_byte_size() as u64);
     }
 
     #[test]
