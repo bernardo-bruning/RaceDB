@@ -33,7 +33,6 @@ impl Storable for Page {
 impl Storable for Pages {
   fn store(self, store: &mut Store) -> Result<Self, Error>
   {
-    let source_serialized: Vec<u8> = self.serialize();
     let page_size = self.page_size;
     let result: Result<Vec<Page>, Error> = self
       .into_iter()
