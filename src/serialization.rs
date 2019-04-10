@@ -39,6 +39,24 @@ impl Serializable for u32 {
     }
 }
 
+impl Serializable for Option<u32> {
+    fn serialize(&self) -> Vec<u8>
+    {
+        match self {
+            Some(value) => value.serialize(),
+            None => (0 as u32).serialize()
+        }
+    }
+
+    fn deserialize(bytes: &[u8]) -> Result<Self, DeserializationError>
+    {
+        match u32::deserialize(bytes) {
+            Ok(value) => Result::Ok(to_option(value)),
+            Err(error) => Result::Err(error)
+        }
+    }
+}
+
 impl Serializable for usize {
     fn serialize(&self) -> Vec<u8>
     {
@@ -62,5 +80,13 @@ impl Serializable for String {
             Ok(value) => Result::Ok(value),
             _ => Result::Err(DeserializationError::new())
         }
+    }
+}
+
+pub fn to_option(value : u32) -> Option<u32>{
+    if value == 0 {
+        Option::None
+    } else {
+        Option::Some(value)
     }
 }

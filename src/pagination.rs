@@ -1,9 +1,9 @@
 use crate::serialization::Serializable;
 use crate::serialization::DeserializationError;
+use crate::serialization::to_option;
 use std::vec::Vec;
 use std::convert::From;
 use std::iter::*;
-use std::io::Error;
 use std::vec::IntoIter;
 use std::slice::Iter;
 
@@ -28,7 +28,7 @@ pub struct Page {
     //Contains page ID, this data is not serialize to not consume space
     pub id: usize,
     // Contains ID for next page
-    pub next: u32,
+    pub next: Option<u32>,
     // Represent size of the content
     pub size: u32,
     // Represent content of the page
@@ -107,7 +107,6 @@ impl Pages {
 
     pub fn get_byte_size(&self) -> usize
     {
-        let pages_offset = 4;
         (Page::get_bytes_size(self.page_size) * self.len())
     }
 }
@@ -147,7 +146,7 @@ fn paginate<TSerializable>(data: &TSerializable, size: usize) -> Vec<Page>
         .chunks(size as usize)
         .map(|x| Page {
             id: 0,
-            next: 0,
+            next: Option::None,
             size: x.len() as u32,
             content: fill(&x.to_vec(), 0, size as usize)
         })
@@ -172,16 +171,18 @@ pub fn mount_data<TSerializable>(pages: &[Page]) -> Result<TSerializable, Deseri
     TSerializable::deserialize(&content)
 }
 
+fn collect_u32_bytes(from: &[u8], starting: usize) -> Vec<u8> {
+    let value_arr: Vec<u8> = from
+        .iter()
+        .skip(starting)
+        .take(4)
+        .map(|x| x.to_owned())
+        .collect();
+    return value_arr
+}
+
 fn collect_u32(from: &[u8], starting: usize) -> Result<u32, DeserializationError>{
-        let mut value: [u8; 4] = [0;4];
-        let value_arr: Vec<u8> = from
-            .iter()
-            .skip(starting)
-            .take(4)
-            .map(|x| x.to_owned())
-            .collect();
-        value.copy_from_slice(&value_arr);
-        u32::deserialize(&value)
+    u32::deserialize(&collect_u32_bytes(from, starting))
 }
 
 impl Serializable for Page {
@@ -207,7 +208,7 @@ impl Serializable for Page {
                 Ok(Page {
                     id: 0,
                     size: size,
-                    next: next,
+                    next: to_option(next),
                     content: content
                 }),
             _ => Result::Err(DeserializationError::new())
@@ -221,7 +222,7 @@ impl From<&[u8]> for Page {
         let size = value.len() as u32;
         Page {
             id: 0,
-            next: 0,
+            next: Option::None,
             size: size,
             content: value.to_vec()
         }
@@ -234,7 +235,7 @@ impl From<&str> for Page {
         let size = value.len() as u32;
         Page {
             id: 0,
-            next: 0,
+            next: Option::None,
             size: size,
             content: value.as_bytes().to_vec()
         }

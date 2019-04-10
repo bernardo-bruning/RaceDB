@@ -85,14 +85,14 @@ mod tests {
             // Page with string "tes"
             Page {
                 id: 0,
-                next: 1,
+                next: Option::Some(1),
                 size: 2,
                 content: "tes".as_bytes().to_vec()
             },
             // Page with string "te"
             Page {
                 id: 1,
-                next: 0,
+                next: Option::None,
                 size: 2,
                 content: "te".as_bytes().to_vec()
             }
