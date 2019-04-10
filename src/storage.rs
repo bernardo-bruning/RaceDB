@@ -23,8 +23,8 @@ impl Storable for Page {
     let result = store.write(&source_serialized);
     
     match (current_position, result) {
-      (Ok(position), Ok(size_bytes_writed)) => Ok(self.set_id(position as usize)),
-      (Ok(position), Err(write_bytes)) => Err(write_bytes),
+      (Ok(position), Ok(_)) => Ok(self.set_id(position as usize)),
+      (Ok(_), Err(write_bytes)) => Err(write_bytes),
       (Err(error_seek), _) => Err(error_seek)
     }
   }
